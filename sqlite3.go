@@ -9,9 +9,11 @@ package sqlite3
 
 /*
 #cgo CFLAGS: -std=gnu99
-#cgo CFLAGS: -DSQLITE_ENABLE_RTREE -DSQLITE_THREADSAFE=1 -DHAVE_USLEEP=1
+#cgo CFLAGS: -DSQLITE_THREADSAFE=1 -DHAVE_USLEEP=1
+#cgo CFLAGS: -DSQLITE_USE_URI=1 -DSQLITE_ENABLE_JSON1 -DSQLITE_ENABLE_COLUMN_METADATA
+#cgo CFLAGS: -DSQLITE_HAS_CODEC
+#cgo CFLAGS: -DSQLITE_OMIT_LOCALTIME -DSQLITE_OMIT_DATETIME_FUNCS
 #cgo linux CFLAGS: -DHAVE_PREAD64=1 -DHAVE_PWRITE64=1
-#cgo CFLAGS: -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_PARENTHESIS -DSQLITE_ENABLE_FTS4_UNICODE61
 #cgo CFLAGS: -DSQLITE_TRACE_SIZE_LIMIT=15
 #cgo CFLAGS: -DSQLITE_DISABLE_INTRINSIC
 #cgo CFLAGS: -Wno-deprecated-declarations
@@ -135,6 +137,10 @@ static int _sqlite3_limit(sqlite3* db, int limitId, int newLimit) {
 #else
   return sqlite3_limit(db, limitId, newLimit);
 #endif
+}
+
+static int _sqlite3_restore_to_point(sqlite3 *db, char *timestamp, int *count) {
+	return sqlite3_restore_to_point(db, 0, timestamp, count);
 }
 */
 import "C"
@@ -1010,6 +1016,18 @@ func (c *SQLiteConn) GetLimit(id int) int {
 // See: sqlite3_limit, http://www.sqlite.org/c3ref/limit.html
 func (c *SQLiteConn) SetLimit(id int, newVal int) int {
 	return int(C._sqlite3_limit(c.db, C.int(id), C.int(newVal)))
+}
+
+func (c *SQLiteConn) GetLastRecoveryPoint() string {
+	res := [256]C.char{}
+	C.sqlite3_last_recovery_point(c.db, &res[0])
+	return C.GoString(&res[0])
+}
+
+func (c *SQLiteConn) RestoreToPoint(timestamp string) int {
+	var restoreCount C.int
+	C._sqlite3_restore_to_point(c.db, C.CString(timestamp), &restoreCount)
+	return int(restoreCount)
 }
 
 // Close the statement.
