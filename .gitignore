@@ -2,4 +2,4 @@
 *.exe
 *.dll
 *.o
-_example/pitr/binlogs/
+binlogs/
