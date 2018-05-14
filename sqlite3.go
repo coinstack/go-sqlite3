@@ -112,6 +112,7 @@ int compareTrampoline(void*, int, char*, int, char*);
 int commitHookTrampoline(void*);
 void rollbackHookTrampoline(void*);
 void updateHookTrampoline(void*, int, char*, char*, sqlite3_int64);
+void errLogTrampoline(void*, int, char*);
 
 #ifdef SQLITE_LIMIT_WORKER_THREADS
 # define _SQLITE_HAS_LIMIT
@@ -141,6 +142,10 @@ static int _sqlite3_limit(sqlite3* db, int limitId, int newLimit) {
 
 static int _sqlite3_restore_to_point(sqlite3 *db, char *timestamp, int *count) {
 	return sqlite3_restore_to_point(db, 0, timestamp, count);
+}
+
+static void _sqlite3_set_err_log(void (*callback)(void*, int, char*), void *pArg) {
+	sqlite3_config(SQLITE_CONFIG_LOG, callback, pArg);
 }
 */
 import "C"
@@ -1028,6 +1033,12 @@ func (c *SQLiteConn) RestoreToPoint(timestamp string) int {
 	var restoreCount C.int
 	C._sqlite3_restore_to_point(c.db, C.CString(timestamp), &restoreCount)
 	return int(restoreCount)
+}
+
+func SetErrLogHandler(callback func(int, string)) {
+	if callback != nil {
+		C._sqlite3_set_err_log((*[0]byte)(unsafe.Pointer(C.errLogTrampoline)), unsafe.Pointer(newHandle(nil, callback)))
+	}
 }
 
 // Close the statement.
