@@ -10373,6 +10373,7 @@ struct fts5_api {
 */
 
 int sqlite3_list_recovery_points(sqlite3 *db, char *name, binn **plist);
+int sqlite3_first_recovery_point(sqlite3 *db, char *res);
 int sqlite3_last_recovery_point(sqlite3 *db, char *res);
 int sqlite3_restore_to_point(sqlite3 *db, char *name, char *datetime, int *pcount);
 

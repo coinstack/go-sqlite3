@@ -1023,16 +1023,31 @@ func (c *SQLiteConn) SetLimit(id int, newVal int) int {
 	return int(C._sqlite3_limit(c.db, C.int(id), C.int(newVal)))
 }
 
-func (c *SQLiteConn) GetLastRecoveryPoint() string {
+func (c *SQLiteConn) GetFirstRecoveryPoint() (string, error) {
 	res := [256]C.char{}
-	C.sqlite3_last_recovery_point(c.db, &res[0])
-	return C.GoString(&res[0])
+	rv := C.sqlite3_first_recovery_point(c.db, &res[0])
+	if rv != C.SQLITE_OK {
+		return "", c.lastError()
+	}
+	return C.GoString(&res[0]), nil
 }
 
-func (c *SQLiteConn) RestoreToPoint(timestamp string) int {
+func (c *SQLiteConn) GetLastRecoveryPoint() (string, error) {
+	res := [256]C.char{}
+	rv := C.sqlite3_last_recovery_point(c.db, &res[0])
+	if rv != C.SQLITE_OK {
+		return "", c.lastError()
+	}
+	return C.GoString(&res[0]), nil
+}
+
+func (c *SQLiteConn) RestoreToPoint(timestamp string) (int, error) {
 	var restoreCount C.int
-	C._sqlite3_restore_to_point(c.db, C.CString(timestamp), &restoreCount)
-	return int(restoreCount)
+	rv := C._sqlite3_restore_to_point(c.db, C.CString(timestamp), &restoreCount)
+	if rv != C.SQLITE_OK {
+		return -1, c.lastError()
+	}
+	return int(restoreCount), nil
 }
 
 func SetErrLogHandler(callback func(int, string)) {

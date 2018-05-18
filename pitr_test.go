@@ -39,7 +39,12 @@ func ExamplePitr() {
 	err = db.Ping()
 	checkErr(err)
 
-	fmt.Printf("[%s]\n", sqlite3conn.GetLastRecoveryPoint())
+	point, err := sqlite3conn.GetLastRecoveryPoint()
+	checkErr(err)
+	fmt.Printf("FirstPoint[%s]\n", point)
+	point, err = sqlite3conn.GetLastRecoveryPoint()
+	checkErr(err)
+	fmt.Printf("LastPoint[%s]\n", point)
 
 	_, err = db.Exec("create table foo (id integer not null primary key, name text)")
 	checkErr(err)
@@ -49,8 +54,9 @@ func ExamplePitr() {
 	checkErr(err)
 	tx.Commit()
 
-	point := sqlite3conn.GetLastRecoveryPoint()
-	fmt.Printf("[%s]\n", point)
+	rp, err := sqlite3conn.GetLastRecoveryPoint()
+	checkErr(err)
+	fmt.Printf("[%s]\n", rp)
 
 	tx, _ = db.Begin()
 	_, err = tx.Exec("insert into foo(name) values ('kslee'), ('hypark')")
@@ -62,7 +68,9 @@ func ExamplePitr() {
 	checkErr(err)
 	tx.Commit()
 
-	fmt.Printf("[%s]\n", sqlite3conn.GetLastRecoveryPoint())
+	point, err = sqlite3conn.GetLastRecoveryPoint()
+	checkErr(err)
+	fmt.Printf("[%s]\n", point)
 
 	var name string
 	rows, err := db.Query("select name from foo order by id")
@@ -78,8 +86,9 @@ func ExamplePitr() {
 	err = rows.Close()
 	checkErr(err)
 
-	count := sqlite3conn.RestoreToPoint(point)
-	fmt.Printf("restore to %s, count: %d\n", point, count)
+	count, err := sqlite3conn.RestoreToPoint(rp)
+	checkErr(err)
+	fmt.Printf("restore to %s, count: %d\n", rp, count)
 
 	row := db.QueryRow("select name from foo where id = 4")
 	err = row.Scan(&name)
@@ -110,13 +119,17 @@ func ExamplePitr() {
 	checkErr(err)
 	tx.Commit()
 
-	fmt.Printf("[%s]\n", sqlite3conn.GetLastRecoveryPoint())
+	point, err = sqlite3conn.GetFirstRecoveryPoint()
+	fmt.Printf("FirstPoint[%s]\n", point)
+	point, err = sqlite3conn.GetLastRecoveryPoint()
+	fmt.Printf("LastPoint[%s]\n", point)
 
 	err = db.Close()
 	checkErr(err)
 
 	// Output:
-	// []
+	// FirstPoint[]
+	// LastPoint[]
 	// [foo.db.0000000000000002]
 	// [foo.db.0000000000000004]
 	// mlogue
@@ -127,5 +140,6 @@ func ExamplePitr() {
 	// sql: no rows in result set
 	// ktlee
 	// opening new db
-	// [foo.db.0000000000000003]
+	// FirstPoint[foo.db.0000000000000001]
+	// LastPoint[foo.db.0000000000000003]
 }
