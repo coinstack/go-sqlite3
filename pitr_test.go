@@ -11,7 +11,7 @@ import (
 const (
 	driver   = "litereplica"
 	pitrPath = "binlogs"
-	dataSrc  = "file:./foo.db?pitr=on&pitr_path=" + pitrPath
+	dataSrc  = "file:" + pitrPath + "/foo.db?pitr=on"
 )
 
 func checkErr(err error) {
@@ -21,8 +21,9 @@ func checkErr(err error) {
 }
 
 func ExamplePitr() {
-	_ = os.Remove("./foo.db")
 	_ = os.RemoveAll(pitrPath)
+	err := os.MkdirAll(pitrPath, 0700)
+	checkErr(err)
 
 	var sqlite3conn *sqlite3.SQLiteConn
 	sqlite3connList := []*sqlite3.SQLiteConn{}
