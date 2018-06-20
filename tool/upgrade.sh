@@ -10,15 +10,15 @@ function update {
 function clone {
     git clone $SRC_REPO $SRC_DIR
     cd $SRC_DIR
-    git checkout go-sqlite3
+    git checkout master
 }
 
 if [ -d "$SRC_DIR" ]; then
     cd $SRC_DIR
     REPO=`git config remote.origin.url`
     if [ "$REPO" == "$SRC_REPO" ]; then
-        git checkout go-sqlite3
-        git pull origin go-sqlite3
+        git checkout master
+        git pull origin master
     else
         cd ..
         rm -rf $SRC_DIR

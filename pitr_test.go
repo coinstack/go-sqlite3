@@ -11,7 +11,7 @@ import (
 const (
 	driver   = "litereplica"
 	pitrPath = "binlogs"
-	dataSrc  = "file:" + pitrPath + "/foo.db?pitr=on"
+	dataSrc  = "file:" + pitrPath + "/foo.db?pitr=on&single_connection=true"
 )
 
 func checkErr(err error) {
