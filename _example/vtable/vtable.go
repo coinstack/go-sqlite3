@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"bitbucket.org/cloudwallet/go-sqlite3"
+	"github.com/coinstack/go-sqlite3"
 )
 
 type githubRepo struct {

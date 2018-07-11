@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"bitbucket.org/cloudwallet/go-sqlite3"
+	"github.com/coinstack/go-sqlite3"
 )
 
 func createBulkInsertQuery(n int, start int) (query string, args []interface{}) {

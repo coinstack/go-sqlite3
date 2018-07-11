@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"bitbucket.org/cloudwallet/go-sqlite3"
+	"github.com/coinstack/go-sqlite3"
 	"log"
 )
 

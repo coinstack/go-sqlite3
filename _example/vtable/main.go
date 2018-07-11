@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"bitbucket.org/cloudwallet/go-sqlite3"
+	"github.com/coinstack/go-sqlite3"
 )
 
 func main() {

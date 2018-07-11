@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	sqlite3 "bitbucket.org/cloudwallet/go-sqlite3"
+	sqlite3 "github.com/coinstack/go-sqlite3"
 )
 
 const (

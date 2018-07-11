@@ -7,7 +7,7 @@ import (
 	"math"
 	"math/rand"
 
-	sqlite "bitbucket.org/cloudwallet/go-sqlite3"
+	sqlite "github.com/coinstack/go-sqlite3"
 )
 
 // Computes x^y
